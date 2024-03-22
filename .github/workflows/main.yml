@@ -15,11 +15,10 @@ jobs:
     - name: Build
       run: |
         mkdir build
-        cd build
+        cd build || exit 1
         echo "Body" > car.txt
         echo "Engine" >> car.txt
         echo "Wheels" >> car.txt
-        cd ..
 
   test:
     runs-on: ubuntu-latest
@@ -32,7 +31,6 @@ jobs:
       
     - name: Test
       run: |
-        cd build
-        grep -q "Body" car.txt && echo "Body exists" || echo "Body missing"
-        grep -q "Engine" car.txt && echo "Engine exists" || echo "Engine missing"
-        grep -q "Wheels" car.txt && echo "Wheels exists" || echo "Wheels missing"
+        grep -q "Body" build/car.txt && echo "Body exists" || echo "Body missing"
+        grep -q "Engine" build/car.txt && echo "Engine exists" || echo "Engine missing"
+        grep -q "Wheels" build/car.txt && echo "Wheels exists" || echo "Wheels missing"
