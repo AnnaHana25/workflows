@@ -1,55 +1,39 @@
-name: Car Assembly Line
+name: Assembly Line
 
 on:
   push:
-    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Create build directory
+        run: mkdir -p build
 
-    - name: Create build directory
-      run: mkdir build
+      - name: Create assembly instructions
+        run: |
+          echo "Build stage instructions:">>build/assembly_instructions.txt
+          echo "1. Add chassis">>build/assembly_instructions.txt
+          echo "2. Add engine">>build/assembly_instructions.txt
+          echo "3. Add wheels">>build/assembly_instructions.txt
+          echo "4. Add interior">>build/assembly_instructions.txt
 
-    - name: Go to build directory and create a text file
-      run: |
-        cd build
-        touch car.txt
-
-    - name: Add car parts to the text file
-      run: |
-        echo "Body" >> car.txt
-        echo "Engine" >> car.txt
-        echo "Wheels" >> car.txt
-
-    - name: Define artifacts path
-      uses: actions/upload-artifact@v2
-      with:
-        name: build
-        path: build/
+      - name: Set build directory as artifact path
+        run: echo "::set-output name=artifact::$(pwd)/build"
 
   test:
     needs: build
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: build
-
-    - name: Go to build directory
-      run: cd build
-
-    - name: Check for car parts in the text file
-      run: |
-        grep "Body" car.txt
-        grep "Engine" car.txt
-        grep "Wheels" car.txt
+      - name: Check for assembly instructions
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: return require('fs').readFileSync('${{needs.build.outputs.artifact}}/assembly_instructions.txt', 'utf8').match(/Add [a-zA-Z]+\b/g)
+        id: assembly_check
+      - name: Check for correct instructions
+        run: |
+          if [ "$(echo ${{steps.assembly_check.outputs.result}} | wc -l)" -ne 4 ]; then
+            echo "Not all instructions were found in the build file!"
+            exit 1
+          fi
