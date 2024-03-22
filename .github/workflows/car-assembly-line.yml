@@ -1,39 +1,29 @@
-name: Assembly Line
+stages:
+  - build
+  - test
 
-on:
-  push:
+build:
+  stage: build
+  script:
+    - mkdir build
+    - cd build
+    - echo "Кузов" >> car_details.txt
+    - echo "Двигун" >> car_details.txt
+    - echo "Колеса" >> car_details.txt
+    - echo "Сидіння" >> car_details.txt
+    - echo "Кермо" >> car_details.txt
+  artifacts:
+    paths:
+      - build/
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create build directory
-        run: mkdir -p build
-
-      - name: Create assembly instructions
-        run: |
-          echo "Build stage instructions:">>build/assembly_instructions.txt
-          echo "1. Add chassis">>build/assembly_instructions.txt
-          echo "2. Add engine">>build/assembly_instructions.txt
-          echo "3. Add wheels">>build/assembly_instructions.txt
-          echo "4. Add interior">>build/assembly_instructions.txt
-
-      - name: Set build directory as artifact path
-        run: echo "::set-output name=artifact::$(pwd)/build"
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check for assembly instructions
-        uses: actions/github-script@v2
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: return require('fs').readFileSync('${{needs.build.outputs.artifact}}/assembly_instructions.txt', 'utf8').match(/Add [a-zA-Z]+\b/g)
-        id: assembly_check
-      - name: Check for correct instructions
-        run: |
-          if [ "$(echo ${{steps.assembly_check.outputs.result}} | wc -l)" -ne 4 ]; then
-            echo "Not all instructions were found in the build file!"
-            exit 1
-          fi
+test:
+  stage: test
+  script:
+    - cd build
+    - grep "Кузов" car_details.txt
+    - grep "Двигун" car_details.txt
+    - grep "Колеса" car_details.txt
+    - grep "Сидіння" car_details.txt
+    - grep "Кермо" car_details.txt
+  dependencies:
+    - build
