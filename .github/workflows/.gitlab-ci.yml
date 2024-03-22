@@ -7,14 +7,17 @@ build:
   script:
     - mkdir build
     - cd build
-    - echo "Кузов" >> car_details.txt
-    - echo "Двигун" >> car_details.txt
-    - echo "Колеса" >> car_details.txt
-    - echo "Сидіння" >> car_details.txt
-    - echo "Кермо" >> car_details.txt
+    - touch car_details.txt
+    - |
+      echo "Кузов" >> car_details.txt
+      echo "Двигун" >> car_details.txt
+      echo "Колеса" >> car_details.txt
+      echo "Сидіння" >> car_details.txt
+      echo "Кермо" >> car_details.txt
   artifacts:
     paths:
       - build/
+    expire_in: 1 hour
 
 test:
   stage: test
