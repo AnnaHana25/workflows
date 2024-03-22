@@ -1,0 +1,27 @@
+name: Car Assembly Line
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create build directory
+        run: mkdir build
+
+      - name: Create details.txt file
+        run: echo "Кузов: сталевий" > build/details.txt && echo "Двигун: V6" >> build/details.txt && echo "Колеса: 18 дюймів" >> build/details.txt
+
+      - name: Test details
+        run: |
+          cd build
+          grep "Кузов" details.txt
+          grep "Двигун" details.txt
+          grep "Колеса" details.txt
