@@ -22,9 +22,9 @@ jobs:
 
     - name: Add car parts to the text file
       run: |
-        echo "Body" >> build/car.txt
-        echo "Engine" >> build/car.txt
-        echo "Wheels" >> build/car.txt
+        echo "Body" >> car.txt
+        echo "Engine" >> car.txt
+        echo "Wheels" >> car.txt
 
     - name: Define artifacts path
       uses: actions/upload-artifact@v2
@@ -50,6 +50,6 @@ jobs:
 
     - name: Check for car parts in the text file
       run: |
-        grep "Body" build/car.txt
-        grep "Engine" build/car.txt
-        grep "Wheels" build/car.txt
+        grep "Body" car.txt
+        grep "Engine" car.txt
+        grep "Wheels" car.txt
